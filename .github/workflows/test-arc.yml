@@ -1,10 +1,34 @@
-name: Actions Runner Controller Demo
-on:
+name: Test ARC Runners
+on: 
   workflow_dispatch:
+  push:
+    branches: [main]
 
 jobs:
-  Explore-GitHub-Actions:
-    # You need to use the INSTALLATION_NAME from the previous step
+  test-runner:
     runs-on: arc-runner-set
     steps:
-    - run: echo "🎉 This job uses runner scale set runners!"
+      - name: Test runner environment
+        run: |
+          echo "Runner is working!"
+          echo "Node: $(hostname)"
+          echo "Available CPU: $(nproc)"
+          echo "Available Memory: $(free -h)"
+          echo "Disk space: $(df -h /)"
+          echo "OS: $(lsb_release -a)"
+          
+      - name: Test scaling
+        run: |
+          echo "Testing multiple concurrent jobs"
+          sleep 60
+          
+  test-scaling:
+    runs-on: arc-runner-set
+    strategy:
+      matrix:
+        job: [1, 2, 3, 4, 5]
+    steps:
+      - name: Concurrent job ${{ matrix.job }}
+        run: |
+          echo "Running job ${{ matrix.job }}"
+          sleep 30
